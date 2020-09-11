@@ -9,9 +9,11 @@ exports.getAllStocks = (req, res) =>{
         data.forEach((doc) => {
             stocks.push({
                 stockId: doc.id,
-                username: doc.data().username,
-                body: doc.data().body,
-                createdAt: doc.data().createdAt
+                // username: doc.data().username,
+                // body: doc.data().body,
+                // createdAt: doc.data().createdAt
+                ...doc.data()
+                
             })
         })
         return res.json(stocks)
