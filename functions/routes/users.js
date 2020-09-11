@@ -1,11 +1,11 @@
-const { db } = require('../util/admin')
+const { db, dbb } = require('../util/admin')
 
 const config = require('../util/config')
 
 const firebase = require('firebase')
 firebase.initializeApp(config)
 
-const { validateSignupData, validateLoginData } = require('../util/validators')
+const { validateSignupData, validateLoginData, reduceUserDetais } = require('../util/validators')
 
 exports.signup = (req, res) => {
     const newUser = {
@@ -86,3 +86,38 @@ exports.login = (req, res) => {
             return res.status(500).json({ error: err.code })
         })
 }
+
+//add user details
+
+exports.addStock = (req, res) => {
+    let userDetails = reduceUserDetais(req.body)
+
+    db.doc(`/users/${req.user.username}`).update({
+        stocks: dbb.FieldValue.arrayUnion(userDetails.stocks)
+    })
+        .then(() => {
+            return res.json({ userDetails })
+        })
+        .catch(err => {
+            console.error(err)
+            return res.status(500).json({ error: err.code })
+        })
+}
+
+exports.removeStock = (req, res) => {
+    let userDetails = reduceUserDetais(req.body)
+
+    db.doc(`/users/${req.user.username}`).update({
+        stocks: dbb.FieldValue.arrayRemove(userDetails.stocks)
+    })
+        .then(() => {
+            return res.json({ userDetails })
+        })
+        .catch(err => {
+            console.error(err)
+            return res.status(500).json({ error: err.code })
+        })
+}
+
+
+

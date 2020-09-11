@@ -39,3 +39,11 @@ exports.validateLoginData = (data) => {
         valid: Object.keys(errors).length === 0 ? true : false //check if errors object is empty(no errors)
     }
 }
+
+exports.reduceUserDetais = (data) => {
+    let userDetails = {}
+
+    if(!isEmpty(data.stocks.trim())) userDetails.stocks = data.stocks
+
+    return userDetails
+}
