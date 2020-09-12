@@ -7,6 +7,7 @@ firebase.initializeApp(config)
 
 const { validateSignupData, validateLoginData, reduceUserDetais } = require('../util/validators')
 
+
 exports.signup = (req, res) => {
     const newUser = {
         email: req.body.email,
@@ -87,7 +88,31 @@ exports.login = (req, res) => {
         })
 }
 
-//add user details
+//get user details
+exports.getUserDetails = (req, res) => {
+    let userData = {}
+    db.doc(`/users/${req.user.username}`).get()
+        .then(doc => {
+            if(doc.exists){
+                userData.credentials = doc.data()
+                return db.collection('stocks').where('username', '==', req.user.username).get()
+            }
+        })
+        .then(data => {
+            userData.stocks = []
+            data.forEach(doc => {
+                userData.stocks.push(doc.data())
+            })
+            return res.json(userData)
+        })
+        .catch((err) => {
+            console.error(err)
+            return res.status(500).json({ error: err.code })
+        })
+}
+
+
+//add stocks
 
 exports.addStock = (req, res) => {
     let userDetails = reduceUserDetais(req.body)
