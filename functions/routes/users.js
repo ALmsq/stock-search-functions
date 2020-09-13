@@ -5,7 +5,7 @@ const config = require('../util/config')
 const firebase = require('firebase')
 firebase.initializeApp(config)
 
-const { validateSignupData, validateLoginData, reduceUserDetais } = require('../util/validators')
+const { validateSignupData, validateLoginData, reduceUserDetails } = require('../util/validators')
 
 
 exports.signup = (req, res) => {
@@ -51,6 +51,8 @@ exports.signup = (req, res) => {
             console.error(err)
             if(err.code === 'auth/email-already-in-use'){
                 return res.status(400).json({ email: 'Email is already in use'})
+            }else if(err.code === 'auth/weak-password'){
+                return res.status(400).json({ password: 'password must be more than 6 characters long'})
             }
             return res.status(500).json({ error: err.code })
         })
@@ -83,7 +85,8 @@ exports.login = (req, res) => {
                 return res.status(403).json({ general: 'wrong password' })
             }else if(err.code === "auth/user-not-found"){
                 return res.status(403).json({ general: 'user not found' })
-            }
+            }else if(err.code === "auth/invalid-email"){
+                return res.status(403).json({ general: 'invalid email' })}
             return res.status(500).json({ error: err.code })
         })
 }
@@ -115,10 +118,17 @@ exports.getUserDetails = (req, res) => {
 //add stocks
 
 exports.addStock = (req, res) => {
-    let userDetails = reduceUserDetais(req.body)
+    // let userDetails = reduceUserDetails(req.body)
+    let userDetails = {}
+    
+    // if(!isEmpty(data.trim()))
+    userDetails.symbols = {}
+
+    userDetails.symbols.name = req.body.name
+    userDetails.symbols.displayName = req.body.displayName
 
     db.doc(`/users/${req.user.username}`).update({
-        stocks: dbb.FieldValue.arrayUnion(userDetails.stocks)
+        symbols: dbb.FieldValue.arrayUnion(userDetails.symbols)
     })
         .then(() => {
             return res.json({ userDetails })

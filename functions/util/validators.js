@@ -40,10 +40,15 @@ exports.validateLoginData = (data) => {
     }
 }
 
-exports.reduceUserDetais = (data) => {
+exports.reduceUserDetails = (data) => {
     let userDetails = {}
+    
+    // if(!isEmpty(data.trim()))
+    userDetails.symbols = {}
 
-    if(!isEmpty(data.stocks.trim())) userDetails.stocks = data.stocks
+    userDetails.symbols.name = data.name
+    userDetails.symbols.displayName = data.displayName
+
 
     return userDetails
 }
